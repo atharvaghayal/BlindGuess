@@ -1,12 +1,22 @@
 import React from 'react';
 import './App.css'; 
 
-// --- BitTitle Component for the Header Text (SIMPLIFIED FOR WHITE COLOR) ---
+// --- BitTitle Component (UNCHANGED logic) ---
 const BitTitle = ({ text }) => {
-  // Split the text into individual characters and map them
-  const coloredCharacters = text.split('').map((char, index) => {
-    // Apply the class for styling, but no random color class
-    // We use a general class 'bit-char' which will be styled white in CSS
+  // We process the text to find the space between words, but QUICKLE has no space.
+  const processedText = text.split('');
+
+  const coloredCharacters = processedText.map((char, index) => {
+    // This space check is kept, but it will not trigger for "QUICKLE"
+    if (char === ' ' && index === 5) {
+      return (
+        <span key={index} className="word-separator">
+          &nbsp;
+        </span>
+      );
+    }
+
+    // All other letters
     return (
       <span key={index} className="bit-char">
         {char}
@@ -21,7 +31,7 @@ const BitTitle = ({ text }) => {
   );
 };
 
-// Helper component for a single tile/box (remains the same)
+// --- Tile and Row Components (UNCHANGED) ---
 const Tile = ({ letter, status }) => {
   const className = `tile ${status}`;
   return (
@@ -31,7 +41,6 @@ const Tile = ({ letter, status }) => {
   );
 };
 
-// Helper component for a row (remains the same)
 const Row = ({ guess }) => {
   // Hardcoded data matching the image: "BLIND" and "WORDS" for styling
   
@@ -87,9 +96,17 @@ function App() {
 
   return (
     <div className="App">
+      
+      {/* --- HELP ICON ELEMENT --- */}
+      <div className="help-icon" onClick={redirectToRules}>
+        ?
+      </div>
+
       <header className="header">
-        <BitTitle text="BLIND WORDLE" />
+        {/* --- TITLE CHANGE HERE --- */}
+        <BitTitle text="QUICKLE" />
       </header>
+      
       <div className="board">
         {allGuesses.map((guess, index) => (
           <Row key={index} guess={guess} />
@@ -98,5 +115,14 @@ function App() {
     </div>
   );
 }
+
+// NOTE: redirectToRules must be defined globally or imported if not in this file, 
+// based on your previous final version. Assuming it is defined,
+// or we can define it simply here for completeness:
+
+const redirectToRules = () => {
+    window.location.href = '/rules.html';
+};
+
 
 export default App;

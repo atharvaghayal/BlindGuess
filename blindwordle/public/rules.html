@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quickle Rules card</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bitcount+Prop+Single:wght@100..900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-dark-bg: #000000;
+            --color-green: #00ff00;
+            --color-yellow: #ffff00;
+            --color-gray: #555555;
+            --color-text-light: #ffffff;
+            --color-card-bg: #111;
+        }
+
+        body {
+            background-color: var(--color-dark-bg);
+            color: var(--color-text-light);
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .rules-container {
+            background-color: var(--color-card-bg);
+            padding: 30px;
+            max-width: 800px;
+            width: 100%;
+            position: relative;
+        }
+
+        .rules-container h1 {
+            color: var(--color-yellow);
+            font-family: 'Bitcount Prop Single', monospace;
+            font-weight: 300;
+            font-size: 2.5em;
+            text-align: center;
+            margin-top: 0;
+            text-shadow: 0 0 5px var(--color-yellow);
+        }
+
+        .subtitle {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+            color: #ddd;
+        }
+        
+        .section h2 {
+            color: var(--color-green);
+            border-bottom: 1px dashed var(--color-gray);
+            padding-bottom: 5px;
+            margin-top: 25px;
+            font-size: 1.2em;
+        }
+
+        ul {
+            list-style-type: '⚡ ';
+            padding-left: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+
+        th, td {
+            border: 1px solid var(--color-gray);
+            padding: 5px 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #222;
+            color: var(--color-yellow);
+        }
+
+        .time-points {
+            padding: 10px;
+            background: #0a0a0a;
+            border: 1px solid #333;
+            margin-top: 15px;
+        }
+        
+        .penalty {
+            color: #ff3333; /* Red color for penalty text */
+            font-weight: bold;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 30px;
+            font-size: 1.1em;
+            color: var(--color-text-light);
+            text-decoration: none;
+            border: 1px solid var(--color-text-light);
+            padding: 8px 15px;
+            width: 150px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="rules-container">
+        <h1>🎮 QUICKLE – RULES CARD</h1>
+        <p class="subtitle">A daily 5-letter guessing challenge with twists &amp; timing!</p>
+        
+        <div class="section">
+            <h2>🕹️ HOW TO PLAY</h2>
+            <ul>
+                <li>Guess the 5-letter hidden word within 6 total attempts.</li>
+                <li>Each guess gives you feedback to help you move closer to the solution.</li>
+                <li>Fewer guesses = higher points!</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>🏅 POINTS SYSTEM (Attempts 1–5)</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Guess Number</th>
+                        <th>Points Earned</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>1st Guess</td><td>25 pts</td></tr>
+                    <tr><td>2nd Guess</td><td>18 pts</td></tr>
+                    <tr><td>3rd Guess</td><td>15 pts</td></tr>
+                    <tr><td>4th Guess</td><td>12 pts</td></tr>
+                    <tr><td>5th Guess</td><td>6 pts</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>⏱️ THE FINAL TWIST – TIMED 6th GUESS</h2>
+            <p>If you still haven’t cracked the word after 5 tries, you get one last chance under strict time pressure!</p>
+
+            <div class="time-points">
+                <p>⏳ 0–5 sec → 5 pts 💨</p>
+                <p>⏳ 6–9 sec → 3 pts</p>
+                <p>⏳ 10–12 sec → 1 pt 🐢</p>
+                <p>⏳ &gt;12 sec → 0 pts ❌</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>❗ IF YOU FAIL ALL 6 GUESSES, "LIFE IS UNFAIR"</h2>
+            <p>A small penalty is added to you score.</p>
+            <p class="penalty">
+                ➤ Point Deduction: –5 points 🔻
+            </p>
+            <p>If your score is already 0 and you fail to guess, your score becomes –5 points.</p>
+        </div>
+
+        <a href="/" class="back-link">← Back to Game</a>
+        <p style="text-align: center;">
+            Quickle-Word Game | Built with ❤️ by Atharva Ghayal
+        </p>
+    </div>
+</body>
+</html>
