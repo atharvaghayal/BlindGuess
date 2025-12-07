@@ -1,128 +1,130 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css'; 
 
-// --- BitTitle Component (UNCHANGED logic) ---
-const BitTitle = ({ text }) => {
-  // We process the text to find the space between words, but QUICKLE has no space.
-  const processedText = text.split('');
-
-  const coloredCharacters = processedText.map((char, index) => {
-    // This space check is kept, but it will not trigger for "QUICKLE"
-    if (char === ' ' && index === 5) {
-      return (
-        <span key={index} className="word-separator">
-          &nbsp;
-        </span>
-      );
-    }
-
-    // All other letters
-    return (
-      <span key={index} className="bit-char">
-        {char}
-      </span>
-    );
-  });
-
-  return (
-    <h1 className="title-bitcount">
-      {coloredCharacters}
-    </h1>
-  );
-};
-
-// --- Tile and Row Components (UNCHANGED) ---
-const Tile = ({ letter, status }) => {
-  const className = `tile ${status}`;
-  return (
-    <div className={className}>
-      {letter}
-    </div>
-  );
-};
-
-const Row = ({ guess }) => {
-  // Hardcoded data matching the image: "BLIND" and "WORDS" for styling
-  
-  const tilesData = guess.split('').map((letter, index) => {
-    let status = 'absent'; // Default gray
-    
-    // Custom overrides to exactly match the image for the first row "BLIND"
-    if (guess === "BLIND") {
-        if (index === 0) status = 'correct'; // B - Green
-        if (index === 1) status = 'absent';  // L - Gray
-        if (index === 2) status = 'absent';  // I - Gray
-        if (index === 3) status = 'present'; // N - Yellow
-        if (index === 4) status = 'present'; // D - Yellow
-    }
-    
-    // Custom overrides to exactly match the image for the second row "WORDS"
-    if (guess === "WORDS") {
-        if (index === 0) status = 'absent';  // W - Gray
-        if (index === 1) status = 'absent';  // O - Gray
-        if (index === 2) status = 'present'; // R - Yellow
-        if (index === 3) status = 'correct'; // D - Green
-        if (index === 4) status = 'absent';  // S - Gray
-    }
-    
-    return { letter, status };
-  });
-
-  // For empty rows, create 'empty' tiles
-  const emptyCount = 5 - guess.length;
-  for (let i = 0; i < emptyCount; i++) {
-    tilesData.push({ letter: '', status: 'empty' });
-  }
-
-  return (
-    <div className="row">
-      {tilesData.map((tile, index) => (
-        <Tile key={index} letter={tile.letter} status={tile.status} />
-      ))}
-    </div>
-  );
-};
-
-// Main App component
-function App() {
-  const allGuesses = [
-    'BLIND', 
-    'WORDS', 
-    '', 
-    '', 
-    '', 
-    '', 
-  ];
-
-  return (
-    <div className="App">
-      
-      {/* --- HELP ICON ELEMENT --- */}
-      <div className="help-icon" onClick={redirectToRules}>
-        ?
-      </div>
-
-      <header className="header">
-        {/* --- TITLE CHANGE HERE --- */}
-        <BitTitle text="QUICKLE" />
-      </header>
-      
-      <div className="board">
-        {allGuesses.map((guess, index) => (
-          <Row key={index} guess={guess} />
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// NOTE: redirectToRules must be defined globally or imported if not in this file, 
-// based on your previous final version. Assuming it is defined,
-// or we can define it simply here for completeness:
-
+// --- Redirection Handler (UNCHANGED) ---
 const redirectToRules = () => {
     window.location.href = '/rules.html';
 };
 
+
+// --- Theme Button Component (UNCHANGED) ---
+const ThemeButton = ({ theme, toggleTheme }) => {
+    // Determine the icon based on the current theme
+    const icon = theme === 'dark' ? '☀️' : '🌙'; 
+
+    return (
+        <div className="theme-icon" onClick={toggleTheme}>
+            {icon}
+        </div>
+    );
+};
+
+
+// --- BitTitle, Tile, and Row Components (UNCHANGED) ---
+const BitTitle = ({ text }) => {
+    const processedText = text.split('');
+    const coloredCharacters = processedText.map((char, index) => {
+        if (char === ' ' && index === 5) {
+            return <span key={index} className="word-separator">&nbsp;</span>;
+        }
+        return <span key={index} className="bit-char">{char}</span>;
+    });
+
+    return (
+        <h1 className="title-bitcount">
+            {coloredCharacters}
+        </h1>
+    );
+};
+
+const Tile = ({ letter, status }) => {
+    const className = `tile ${status}`;
+    return (
+        <div className={className}>
+            {letter}
+        </div>
+    );
+};
+
+const Row = ({ guess }) => {
+    const tilesData = guess.split('').map((letter, index) => {
+        let status = 'absent';
+        if (guess === "BLIND") {
+            if (index === 0) status = 'correct'; 
+            if (index === 1) status = 'absent';
+            if (index === 2) status = 'absent';
+            if (index === 3) status = 'present';
+            if (index === 4) status = 'present';
+        }
+        if (guess === "WORDS") {
+            if (index === 0) status = 'absent';
+            if (index === 1) status = 'absent';
+            if (index === 2) status = 'present'; 
+            if (index === 3) status = 'correct'; 
+            if (index === 4) status = 'absent';
+        }
+        return { letter, status };
+    });
+    const emptyCount = 5 - guess.length;
+    for (let i = 0; i < emptyCount; i++) {
+        tilesData.push({ letter: '', status: 'empty' });
+    }
+    return (
+        <div className="row">
+            {tilesData.map((tile, index) => (
+                <Tile key={index} letter={tile.letter} status={tile.status} />
+            ))}
+        </div>
+    );
+};
+
+// Main App component
+function App() {
+    const [theme, setTheme] = useState('dark');
+
+    const toggleTheme = () => {
+        setTheme(current => (current === 'dark' ? 'light' : 'dark'));
+    };
+
+    // --- KEY CHANGE: Apply theme class to the body tag ---
+    useEffect(() => {
+        // Remove existing theme classes
+        document.body.classList.remove('dark-theme', 'light-theme');
+        // Add the new theme class
+        document.body.classList.add(`${theme}-theme`);
+    }, [theme]); // Reruns whenever the 'theme' state changes
+    // ----------------------------------------------------
+
+
+    const allGuesses = [
+        'BLIND', 'WORDS', '', '', '', '',
+    ];
+
+    return (
+        // The .App div no longer needs the theme class, but we keep it clean.
+        <div className="App"> 
+            
+            <div className="help-icon" onClick={redirectToRules}>
+                ?
+            </div>
+            
+            <ThemeButton theme={theme} toggleTheme={toggleTheme} />
+
+            <div className="profile-icon">
+                👤
+            </div>
+
+            <header className="header">
+                <BitTitle text="QUICKLE" />
+            </header>
+            
+            <div className="board">
+                {allGuesses.map((guess, index) => (
+                    <Row key={index} guess={guess} />
+                ))}
+            </div>
+        </div>
+    );
+}
 
 export default App;
