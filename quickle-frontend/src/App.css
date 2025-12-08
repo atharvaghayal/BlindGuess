@@ -65,44 +65,69 @@ body.light-theme {
 }
 
 /* --- ICON STYLING (Fixed to Viewport) --- */
-.help-icon, .profile-icon, .theme-icon {
+/* --- ICON POSITIONING --- */
+.help-icon, .theme-icon, .login-btn { 
     position: fixed; 
     top: 20px;
+    cursor: pointer;
+    user-select: none;
+    z-index: 1000; 
+    
+    color: var(--color-text-primary);
+    border: 2px solid var(--color-icon-border);
+}
+
+.help-icon {
+    left: 20px;
     width: 30px;
     height: 30px;
     border-radius: 50%;
-    border: 2px solid var(--color-icon-border);
-    color: var(--color-text-primary);
     font-size: 1.5em;
     font-weight: bold;
     line-height: 28px;
     text-align: center;
-    cursor: pointer;
-    user-select: none;
     text-shadow: 0 0 5px var(--color-icon-border);
-    z-index: 1000; 
+}
+
+/* --- Login/Signup Button (Now acting as the far-right anchor) --- */
+.login-btn {
+    right: 20px; /* Aligned to the far right */
+    padding: 5px 10px;
+    background: none;
+    font-size: 0.9em;
+    font-family: 'Courier New', monospace;
+    text-transform: uppercase;
+    border-radius: 4px;
+    
+    /* Ensure the button is sized normally */
+    width: auto; 
+    height: auto; 
+    line-height: normal; /* Override icon specific line-height */
+
+    text-shadow: 0 0 5px var(--color-icon-border);
+}
+
+/* --- Theme Toggle Icon (Positioned LEFT of the login button) --- */
+.theme-icon {
+    right: 160px; /* Pushes the icon leftward based on the button's presence */
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    font-size: 1.1em;
+    line-height: 28px;
+    text-align: center;
+    text-shadow: 0 0 5px var(--color-icon-border);
 }
 
 /* --- LIGHT THEME ICON OVERRIDE: Remove Shadow --- */
 body.light-theme .help-icon, 
-body.light-theme .profile-icon, 
-body.light-theme .theme-icon {
+body.light-theme .theme-icon, 
+body.light-theme .login-btn {
     text-shadow: none;
 }
 
-/* --- ICON POSITIONING --- */
-.help-icon {
-    left: 20px;
-}
-.profile-icon {
-    right: 20px;
-    font-size: 1.4em;
-    line-height: 30px; 
-}
-.theme-icon {
-    right: 70px; /* Separated from profile icon */
-    font-size: 1.1em;
-    line-height: 28px;
+body.light-theme .login-btn {
+    background: transparent; 
 }
 
 

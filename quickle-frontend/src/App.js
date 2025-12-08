@@ -122,10 +122,12 @@ const StatsModal = ({ stats, onClose, resetTime, formatTime, answerWord, isWin }
 };
 
 
+// Main App component
 function App() {
     const MAX_GUESSES = 6;
     const WORD_LENGTH = 5;
 
+    // --- State Management ---
     const [theme, setTheme] = useState('dark');
     const [guesses, setGuesses] = useState([]);
     const [currentGuess, setCurrentGuess] = useState('');
@@ -134,21 +136,25 @@ function App() {
     const [score, setScore] = useState(0); 
     const [systemWord, setSystemWord] = useState('');
     
+    // 6th Guess Timer State
     const [timerSeconds, setTimerSeconds] = useState(0);
     const [isTimerActive, setIsTimerActive] = useState(false);
     const timerRef = useRef(null);
 
+    // Modal State
     const [isStatsModalOpen, setIsStatsModalOpen] = useState(false);
     const [statsData, setStatsData] = useState(null);
     const [resetTime, setResetTime] = useState(null);
-
+    
+    
+    // --- Initial Word Fetch (UNCHANGED) ---
     const fetchSystemWord = useCallback(async () => {
         try {
             const wordResponse = await axios.get('http://localhost:8000/api/wordle/daily-word');
             setSystemWord(wordResponse.data.word || "QUICK"); 
         } catch (error) {
             console.error("Error fetching daily word:", error);
-            setSystemWord("QUICK");
+            setSystemWord("QUICK"); // Fallback word
         }
     }, []);
 
@@ -156,15 +162,20 @@ function App() {
         fetchSystemWord();
     }, [fetchSystemWord]);
 
+
+    // --- Theme Logic (UNCHANGED) ---
     const toggleTheme = () => {
         setTheme(current => (current === 'dark' ? 'light' : 'dark'));
     };
 
+    // Apply theme class to the body tag
     useEffect(() => {
         document.body.classList.remove('dark-theme', 'light-theme');
         document.body.classList.add(`${theme}-theme`);
     }, [theme]);
 
+
+    // --- Game Reset Time (UNCHANGED) ---
     const fetchResetTime = useCallback(async () => {
         try {
             const response = await axios.get(`http://localhost:8000/api/wordle/next-reset`);
@@ -183,12 +194,13 @@ function App() {
         return () => clearInterval(resetInterval);
     }, [fetchResetTime]);
 
+
+    // --- Scoring Logic (UNCHANGED) ---
     const calculateScore = useCallback((guessNumber, timeSeconds) => {
         if (guessNumber <= 5) {
             const pointsMap = { 1: 25, 2: 18, 3: 15, 4: 12, 5: 6 };
             return pointsMap[guessNumber] || 0;
         } 
-        
         if (guessNumber === 6) {
             if (timeSeconds <= 5) return 5;
             if (timeSeconds <= 9) return 3;
@@ -198,6 +210,7 @@ function App() {
         return 0;
     }, []);
 
+    // --- Statistics Modal Display (UNCHANGED) ---
     const showStatistics = useCallback(async (finalScore, isWin) => {
         const userId = 0; 
         try {
@@ -218,6 +231,7 @@ function App() {
         }
     }, []);
 
+    // --- 6th Guess Timer Logic (UNCHANGED) ---
     useEffect(() => {
         if (isTimerActive) {
             timerRef.current = setInterval(() => {
@@ -234,6 +248,7 @@ function App() {
         return () => clearInterval(timerRef.current);
     }, [isTimerActive]);
 
+    // --- Game Submission Logic (UNCHANGED) ---
     const submitGuess = useCallback(async () => {
         const guessNumber = guesses.length + 1;
         const guessWord = currentGuess;
@@ -265,12 +280,12 @@ function App() {
                 setIsTimerActive(true);
                 setTimerSeconds(0);
             }
-            
         } catch (error) {
             console.error("Error verifying guess:", error);
         }
     }, [currentGuess, guesses.length, MAX_GUESSES, timerSeconds, score, calculateScore, showStatistics]);
 
+    // --- Keyboard Input Handler (UNCHANGED) ---
     const handleKeyDown = useCallback((event) => {
         if (gameState !== 'playing' || isStatsModalOpen) return;
         
@@ -291,12 +306,15 @@ function App() {
         }
     }, [currentGuess, WORD_LENGTH, submitGuess, gameState, isStatsModalOpen]);
 
+    // Attach keyboard listener (UNCHANGED)
     useEffect(() => {
         document.addEventListener('keydown', handleKeyDown);
         return () => {
             document.removeEventListener('keydown', handleKeyDown);
         };
     }, [handleKeyDown]);
+
+    // Create 6 rows for the board (UNCHANGED)
     const boardRows = Array.from({ length: MAX_GUESSES }, (_, index) => {
         const status = solvedStatuses[index];
         if (index < guesses.length) {
@@ -308,6 +326,7 @@ function App() {
         }
     });
 
+    // Formatting countdown timer (UNCHANGED)
     const formatTime = (totalSeconds) => {
         const hours = Math.floor(totalSeconds / 3600);
         const minutes = Math.floor((totalSeconds % 3600) / 60);
@@ -322,8 +341,16 @@ function App() {
             
             <ThemeButton theme={theme} toggleTheme={toggleTheme} />
 
-            <div className="profile-icon">👤</div>
+            {/* --- REPLACED PROFILE ICON with Signup/Login BUTTON --- */}
+            <button 
+                className="login-btn" 
+                onClick={() => console.log("Signup/Login button clicked (Non-functional)")}
+            >
+                Signup/Login
+            </button>
+            {/* -------------------------------------------------------- */}
 
+            {/* Timer Display for 6th Guess */}
             {isTimerActive && (
                 <div className="timer-display">
                     {timerSeconds.toString().padStart(2, '0')}s / 12s
@@ -337,6 +364,7 @@ function App() {
             
             <div className="board">{boardRows}</div>
 
+            {/* Statistics Modal */}
             {isStatsModalOpen && statsData && (
                 <StatsModal 
                     stats={statsData} 
