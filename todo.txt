@@ -4,3 +4,4 @@ points system for 0 points(more than 12 seconds.
 signup and login highly secure auth page
 Leaderboard
 deployment
+update 1 single playcount(user cannot play once he played anonymously)
