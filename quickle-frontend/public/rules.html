@@ -120,6 +120,9 @@
             <ul>
                 <li>Guess the 5-letter hidden word within 6 total attempts.</li>
                 <li>Each guess gives you feedback to help you move closer to the solution.</li>
+                <li>Letter with 🟢 color indicates letter in correct place.</li>
+                <li>Letter with 🟡 color indicates letter exists in word but at wrong place.</li>
+                <li>Letter with ⚫ color indicates that letter dosen't exists in the word.</li>
                 <li>Fewer guesses = higher points!</li>
             </ul>
         </div>
@@ -169,5 +172,18 @@
             Quickle-Word Game | Built with ❤️ by Atharva Ghayal
         </p>
     </div>
+    <script>
+    // Function to navigate back to the game page
+    function goBackToGame() {
+        window.location.href = '/';
+    }
+
+    document.addEventListener('keyup', function(event) {
+        // Check if the pressed key is the Escape key (keyCode 27)
+        if (event.keyCode === 27 || event.key === 'Escape') {
+            goBackToGame();
+        }
+    });
+</script>
 </body>
 </html>

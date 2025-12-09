@@ -177,6 +177,7 @@ body.light-theme .bit-char {
 body.light-theme .score-display,
 body.light-theme .timer-display {
     text-shadow: none;
+    color: var(--color-light-text-primary);
 }
 
 /* ---------------------------------
