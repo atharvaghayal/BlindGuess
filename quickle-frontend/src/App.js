@@ -193,7 +193,7 @@ function App() {
     // --- Initial Word Fetch ---
     const fetchSystemWord = useCallback(async () => {
         try {
-            const wordResponse = await axios.get('http://localhost:8000/api/wordle/daily-word');
+            const wordResponse = await axios.get(`${API_BASE_URL}/daily-word`);
             setSystemWord(wordResponse.data.word || "QUICK"); 
         } catch (error) {
             console.error("Error fetching daily word:", error);
