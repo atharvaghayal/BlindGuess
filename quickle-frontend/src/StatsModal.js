@@ -64,7 +64,7 @@ const StatsModal = ({ stats, onClose, resetTime, formatTime, answerWord, isWin }
 
                 {!isLoggedIn && (
                     <p className="login-prompt">
-                        “If you want to save your scores and appear at the top of the leaderboard, then sign up or log in.”
+                        “Sign-up OR Login if you want to save your scores and appear at the top of the leaderboard.”
                     </p>
                 )}
                 

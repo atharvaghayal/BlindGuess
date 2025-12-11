@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import axios from 'axios';
 import './App.css'; 
+import StatsModal from './StatsModal'; // Assuming StatsModal is in a separate file
 
 const API_BASE_URL = 'http://localhost:8000/api/wordle';
 
@@ -56,109 +57,24 @@ const Row = ({ guess, solutionStatus }) => {
 };
 
 
-// --- Toast Component for Notifications ---
+// --- Toast Component for Notifications (FIXED STRUCTURE) ---
 const Toast = ({ message, type, onClose }) => {
     
-    // 1. HOOKS MUST COME FIRST!
+    // 1. HOOKS MUST COME FIRST (to avoid conditional hook error)
     useEffect(() => {
-        // Only set the timer if a message is present
         if (message) { 
             const timer = setTimeout(onClose, 2000); 
             return () => clearTimeout(timer);
         }
-        // Return nothing if there is no message, but the hook structure remains consistent
         return undefined; 
     }, [message, onClose]);
 
-    // 2. Conditional rendering logic can follow the hooks
+    // 2. Conditional rendering can follow
     if (!message) return null; 
 
     return (
         <div className={`toast toast-${type}`}>
             {message}
-        </div>
-    );
-};
-
-
-// --- Stats Modal Component ---
-const StatsModal = ({ stats, onClose, resetTime, formatTime, answerWord, isWin }) => {
-    useEffect(() => { // <--- This is likely Line 63
-        const handleEsc = (event) => {
-            if (event.key === 'Escape') onClose();
-        };
-        document.addEventListener('keydown', handleEsc);
-        return () => document.removeEventListener('keydown', handleEsc);
-    }, [onClose]);
-
-    const isLoggedIn = stats.is_logged_in;
-
-    // --- ANONYMOUS FIRST-TIME STATS LOGIC ---
-    if (!isLoggedIn) {
-        stats.times_played = 1;
-        stats.streak = isWin ? 1 : 0;
-        stats.max_streak = isWin ? 1 : 0;
-        stats.win_percentage = isWin ? 100.00 : 0.00;
-    }
-
-    // Format streak display (1* if streak is exactly 1, 0 otherwise)
-    const streakDisplay = stats.streak === 1 ? '1*' : stats.streak.toString();
-    const maxStreakDisplay = stats.max_streak === 1 ? '1*' : stats.max_streak.toString();
-
-    const headerText = isWin ? '🥳 CONGRATULATIONS! 🥳' : 'GAME OVER';
-    const headerClass = isWin ? 'win-header' : 'loss-header';
-
-    return (
-        <div className="modal-overlay" onClick={onClose}>
-            <div className="stats-card" onClick={(e) => e.stopPropagation()}>
-                <button className="close-btn" onClick={onClose}>X</button>
-                
-                <h2 className={headerClass}>{headerText}</h2>
-                
-                {/* Display Answer on Loss */}
-                {!isWin && (
-                    <div className="answer-reveal">
-                        The word was: <span className="actual-answer">{answerWord}</span>
-                    </div>
-                )}
-
-                <div className="stats-row">
-                    <div className="stat-item">
-                        <div className="stat-label">Played</div>
-                        <div className="stat-value">{stats.times_played}</div>
-                    </div>
-                    <div className="stat-item">
-                        <div className="stat-label">Streak</div>
-                        <div className="stat-value">{streakDisplay}</div>
-                    </div>
-                    <div className="stat-item">
-                        <div className="stat-label">Max Streak</div>
-                        <div className="stat-value">{maxStreakDisplay}</div>
-                    </div>
-                    <div className="stat-item">
-                        <div className="stat-label">Win %</div>
-                        <div className="stat-value">{stats.win_percentage.toFixed(2)}%</div>
-                    </div>
-                </div>
-
-                {/* Login Prompt (Anonymous Only) */}
-                {!isLoggedIn && (
-                    <p className="login-prompt">
-                        “If you want to save your scores and appear at the top of the leaderboard, then sign up or log in.”
-                    </p>
-                )}
-                
-                {/* Next Game Countdown */}
-                <div className="countdown-section">
-                    <p>Next Quickle game will be available in</p>
-                    <div className="countdown-timer">{formatTime(resetTime)}</div>
-                </div>
-
-                <div className="footer-credit">
-                    Quickle-Word Game | Built with ❤️ by Atharva Ghayal
-                </div>
-
-            </div>
         </div>
     );
 };
@@ -177,7 +93,7 @@ function App() {
     const [gameState, setGameState] = useState('playing'); 
     const [score, setScore] = useState(0); 
     const [systemWord, setSystemWord] = useState(''); 
-    const [toastMessage, setToastMessage] = useState(null); // Toast state
+    const [toastMessage, setToastMessage] = useState(null); 
     
     // 6th Guess Timer State
     const [timerSeconds, setTimerSeconds] = useState(0);
@@ -190,7 +106,7 @@ function App() {
     const [resetTime, setResetTime] = useState(null);
     
     
-    // --- Initial Word Fetch ---
+    // --- Initial Word Fetch (USING API_BASE_URL) ---
     const fetchSystemWord = useCallback(async () => {
         try {
             const wordResponse = await axios.get(`${API_BASE_URL}/daily-word`);
@@ -218,10 +134,10 @@ function App() {
     }, [theme]);
 
 
-    // --- Game Reset Time ---
+    // --- Game Reset Time (USING API_BASE_URL) ---
     const fetchResetTime = useCallback(async () => {
         try {
-            const response = await axios.get(`http://localhost:8000/api/wordle/next-reset`);
+            const response = await axios.get(`${API_BASE_URL}/next-reset`);
             setResetTime(response.data.time_remaining_seconds);
         } catch (error) {
             console.error("Error fetching reset time:", error);
@@ -238,21 +154,17 @@ function App() {
     }, [fetchResetTime]);
 
 
-    // --- Game Scoring Logic (FIXED for >= 12 seconds = 0 points) ---
+    // --- Game Scoring Logic (Fixed) ---
     const calculateScore = useCallback((guessNumber, timeSeconds) => {
         if (guessNumber <= 5) {
             const pointsMap = { 1: 25, 2: 18, 3: 15, 4: 12, 5: 6 };
             return pointsMap[guessNumber] || 0;
         } 
         
-        // 6th Guess Timed Scoring
         if (guessNumber === 6) {
             if (timeSeconds <= 5) return 5;
             if (timeSeconds <= 9) return 3;
-            // The FIX: Only award 1 point if time is strictly less than 12 seconds
             if (timeSeconds < 12) return 1; 
-            
-            // 12 seconds or more returns 0 points
             return 0; 
         }
         return 0;
@@ -262,6 +174,7 @@ function App() {
     const showStatistics = useCallback(async (finalScore, isWin) => {
         const userId = 0; // Anonymous user simulation
         try {
+            // Note: This endpoint is outside the specific API_BASE_URL, keeping the full path
             const response = await axios.get(`http://localhost:8000/api/user/stats?user_id=${userId}`);
             
             setStatsData(response.data);
@@ -298,13 +211,13 @@ function App() {
     }, [isTimerActive]);
 
 
-    // --- Game Submission Logic ---
+    // --- Game Submission Logic (USING API_BASE_URL) ---
     const submitGuess = useCallback(async () => {
         const guessNumber = guesses.length + 1;
         const guessWord = currentGuess;
         
         try {
-            const response = await axios.post(`http://localhost:8000/api/wordle/guess`, { guess: guessWord });
+            const response = await axios.post(`${API_BASE_URL}/guess`, { guess: guessWord });
             const { status_array, is_correct } = response.data;
             
             // 1. Update Game State
@@ -313,7 +226,6 @@ function App() {
             setCurrentGuess('');
             
             if (is_correct) {
-                // WON: Calculate final score and end game
                 const finalScore = score + calculateScore(guessNumber, timerSeconds);
                 setScore(finalScore);
                 setGameState('won');
@@ -321,7 +233,6 @@ function App() {
                 showStatistics(finalScore, true);
             
             } else if (guessNumber === MAX_GUESSES) {
-                // LOST: Calculate penalty and end game
                 const penaltyAmount = 5;
                 const finalScore = score - penaltyAmount; 
                 setScore(finalScore);
@@ -330,7 +241,6 @@ function App() {
                 showStatistics(finalScore, false);
             
             } else if (guessNumber === MAX_GUESSES - 1) {
-                // 5th guess submitted, start timer for 6th guess
                 setIsTimerActive(true);
                 setTimerSeconds(0);
             }
@@ -400,7 +310,7 @@ function App() {
     };
 
     const redirectToAuth = () => {
-        // Redirect to the external HTML file for Signup/Login
+        // Since the backend authentication routes are removed, this button only redirects
         window.location.href = '/auth.html'; 
     };
 
