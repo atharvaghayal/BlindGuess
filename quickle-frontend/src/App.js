@@ -94,6 +94,8 @@ function App() {
     const [score, setScore] = useState(0); 
     const [systemWord, setSystemWord] = useState(''); 
     const [toastMessage, setToastMessage] = useState(null); 
+    const [isLocked, setIsLocked] = useState(false); // Device-level one-play lock
+    const [showLockModal, setShowLockModal] = useState(false);
     
     // 6th Guess Timer State
     const [timerSeconds, setTimerSeconds] = useState(0);
@@ -105,6 +107,28 @@ function App() {
     const [statsData, setStatsData] = useState(null);
     const [resetTime, setResetTime] = useState(null);
     
+    // --- One-play-per-day lock ---
+    const todayKey = new Date().toISOString().slice(0, 10);
+    useEffect(() => {
+        const lastPlayed = localStorage.getItem('quickle_play_date');
+        if (lastPlayed === todayKey) {
+            setIsLocked(true);
+            setGameState('locked');
+            setIsTimerActive(false);
+            setToastMessage("Game over. Come back tomorrow for a new word.");
+            setShowLockModal(true);
+        }
+    }, [todayKey]);
+
+    // Allow closing the lock modal with Escape
+    useEffect(() => {
+        if (!showLockModal) return;
+        const handleEsc = (e) => {
+            if (e.key === 'Escape') setShowLockModal(false);
+        };
+        window.addEventListener('keydown', handleEsc);
+        return () => window.removeEventListener('keydown', handleEsc);
+    }, [showLockModal]);
     
     // --- Initial Word Fetch (USING API_BASE_URL) ---
     const fetchSystemWord = useCallback(async () => {
@@ -213,8 +237,16 @@ function App() {
 
     // --- Game Submission Logic (USING API_BASE_URL) ---
     const submitGuess = useCallback(async () => {
+        if (isLocked) {
+            setToastMessage("Game over. Come back tomorrow for a new word.");
+            setShowLockModal(true);
+            return;
+        }
         const guessNumber = guesses.length + 1;
         const guessWord = currentGuess;
+        if (!localStorage.getItem('quickle_play_date')) {
+            localStorage.setItem('quickle_play_date', todayKey);
+        }
         
         try {
             const response = await axios.post(`${API_BASE_URL}/guess`, { guess: guessWord });
@@ -230,6 +262,9 @@ function App() {
                 setScore(finalScore);
                 setGameState('won');
                 setIsTimerActive(false);
+                setIsLocked(true);
+                localStorage.setItem('quickle_play_date', todayKey);
+                setShowLockModal(true);
                 showStatistics(finalScore, true);
             
             } else if (guessNumber === MAX_GUESSES) {
@@ -238,6 +273,9 @@ function App() {
                 setScore(finalScore);
                 setGameState('lost');
                 setIsTimerActive(false);
+                setIsLocked(true);
+                localStorage.setItem('quickle_play_date', todayKey);
+                setShowLockModal(true);
                 showStatistics(finalScore, false);
             
             } else if (guessNumber === MAX_GUESSES - 1) {
@@ -254,12 +292,12 @@ function App() {
                 setToastMessage("An unexpected error occurred.");
             }
         }
-    }, [currentGuess, guesses.length, MAX_GUESSES, timerSeconds, score, calculateScore, showStatistics]);
+    }, [currentGuess, guesses.length, MAX_GUESSES, timerSeconds, score, calculateScore, showStatistics, isLocked, todayKey]);
 
 
     // --- Keyboard Input Handler ---
     const handleKeyDown = useCallback((event) => {
-        if (gameState !== 'playing' || isStatsModalOpen) return;
+        if (gameState !== 'playing' || isStatsModalOpen || isLocked) return;
         
         const key = event.key;
 
@@ -279,7 +317,7 @@ function App() {
         if (key === 'Enter' && currentGuess.length === WORD_LENGTH) {
             submitGuess();
         }
-    }, [currentGuess, WORD_LENGTH, submitGuess, gameState, isStatsModalOpen]);
+    }, [currentGuess, WORD_LENGTH, submitGuess, gameState, isStatsModalOpen, isLocked]);
 
     // Attach keyboard listener
     useEffect(() => {
@@ -349,6 +387,19 @@ function App() {
                 type="error"
                 onClose={() => setToastMessage(null)} 
             />
+
+            {/* Lock Modal */}
+            {showLockModal && (
+                <div className="lock-modal-overlay" onClick={() => setShowLockModal(false)}>
+                    <div className="lock-modal" onClick={(e) => e.stopPropagation()}>
+                        <h3>Game over</h3>
+                        <p>Come back tomorrow for a new word.</p>
+                        <button className="primary-btn" onClick={() => setShowLockModal(false)}>
+                            Close
+                        </button>
+                    </div>
+                </div>
+            )}
 
             {/* Statistics Modal */}
             {isStatsModalOpen && statsData && (

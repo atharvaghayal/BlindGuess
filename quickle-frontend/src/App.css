@@ -376,6 +376,35 @@ body.light-theme .countdown-timer {
     color: #999;
 }
 
+/* --- LOCK MODAL --- */
+.lock-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 20000;
+    padding: 16px;
+}
+
+.lock-modal {
+    background: #111;
+    color: var(--color-text-primary);
+    border: 2px solid var(--color-icon-border);
+    padding: 20px;
+    width: 100%;
+    max-width: 360px;
+    text-align: center;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+}
+
+body.light-theme .lock-modal {
+    background: #fff;
+    color: var(--color-light-text-primary);
+}
+
 /* --- AUTH MODAL --- */
 .auth-modal-overlay {
     position: fixed;
