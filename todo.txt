@@ -1,5 +1,4 @@
 signup and login highly secure auth page.
 Update Stats card.
 Leaderboard.
-update 1 single playcount(user cannot play once he played anonymously) and also user cannot play even he refreshes page.
-decide deployment date.
+decide deployment date. 
