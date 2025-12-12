@@ -1,4 +1,4 @@
 signup and login highly secure auth page.
 Update Stats card.
 Leaderboard.
-decide deployment date. 
+decide deployment date.
